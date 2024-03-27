@@ -18,3 +18,28 @@ def get_task(task_id):
         if task['id'] == task_id:
             return task
     return {'error': f"Task with an ID of {task_id} does not exist"}, 404
+
+@app.route('/tasks', methods=['POST'])
+def create_task():
+    if not request.is_json:
+        return{'error': 'Your content-type must be application/json'}, 400
+    data = request.json
+    required_fields = ['title', 'description', 'dueDate']
+    missing_fields = []
+    for field in required_fields:
+        if field not in data:
+            missing_fields.append(field)
+    if missing_fields:
+        return {'error': f"{', '.join(missing_fields)} must be in the request body"}, 400
+    title = data.get('title')
+    description = data.get('description')
+    due_date = data.get('dueDate')
+    new_task = {
+        'id': len(tasks_list) + 1,
+        'title': title,
+        'description': description,
+        'completed': False,
+        'dueDate': due_date
+    }
+    tasks_list.append(new_task)
+    return new_task, 201
