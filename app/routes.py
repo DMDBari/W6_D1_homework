@@ -1,6 +1,7 @@
 from flask import request
-from app import app
-from fake_tasks.tasks import tasks_list
+from app import app, db
+from .models import Task 
+
 
 @app.route("/")
 def index():
@@ -8,16 +9,16 @@ def index():
 
 @app.route('/tasks')
 def get_tasks():
-    tasks = tasks_list
-    return tasks
+    tasks = db.session.execute(db.select(Task)).scalars().all()
+    return [t.to_dict() for t in tasks]
 
 @app.route('/tasks/<int:task_id>')
 def get_task(task_id):
-    tasks = tasks_list
-    for task in tasks:
-        if task['id'] == task_id:
-            return task
-    return {'error': f"Task with an ID of {task_id} does not exist"}, 404
+    task = db.session.get(Task, task_id)
+    if task:
+        return task.to_dict()
+    else:
+        return {'error': f"Task with an ID of {task_id} does not exist"}, 404
 
 @app.route('/tasks', methods=['POST'])
 def create_task():
@@ -34,12 +35,5 @@ def create_task():
     title = data.get('title')
     description = data.get('description')
     due_date = data.get('dueDate')
-    new_task = {
-        'id': len(tasks_list) + 1,
-        'title': title,
-        'description': description,
-        'completed': False,
-        'dueDate': due_date
-    }
-    tasks_list.append(new_task)
-    return new_task, 201
+    new_task = Task(title=title, description=description, due_date=due_date)
+    return new_task.to_dict(), 201

@@ -7,9 +7,11 @@ class Task(db.Model):
     description = db.Column(db.String, nullable=False)
     completed = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
-    due_date = db.Column(db.String, nullable=False)
+    due_date = db.Column(db.String, nullable=True)
 
-    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.save()
     
     def __repr__(self):
         return f"<Task {self.id}|{self.title}>"
@@ -17,3 +19,13 @@ class Task(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "completed": self.completed,
+            "createdAt": self.created_at,
+            "dueDate": self.due_date
+        }
