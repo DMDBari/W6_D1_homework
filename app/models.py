@@ -69,7 +69,7 @@ class User(db.Model):
 
     def set_password(self, plaintext_password):
         self.password = generate_password_hash(plaintext_password)
-        self.save
+        self.save()
     
     def check_password(self, plaintext_password):
         return check_password_hash(self.password, plaintext_password)
