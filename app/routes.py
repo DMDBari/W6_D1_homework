@@ -54,7 +54,7 @@ def edit_user(user_id):
         return {'error': "This is not your account.  You do not have permission to edit"}, 403
     data = request.json
     user.update(**data)
-    return user.to_dict
+    return user.to_dict()
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 @token_auth.login_required()
@@ -111,11 +111,11 @@ def create_task():
     new_task = Task(title=title, description=description, due_date=due_date, user_id=current_user.id)
     return new_task.to_dict(), 201
 
-@app.route('/tasks/<int:post_id>', methods=['PUT'])
+@app.route('/tasks/<int:task_id>', methods=['PUT'])
 @token_auth.login_required()
 def edit_task(task_id):
     if not request.is_json:
-        return {'error': 'Your cuontent-type must be application/json'}, 400
+        return {'error': 'Your content-type must be application/json'}, 400
     task = db.session.get(Task, task_id)
     if task is None:
         return {'error': f"Task with ID #{task_id} does not exist"}, 404
@@ -124,7 +124,7 @@ def edit_task(task_id):
         return {'error': "This is not your post. You do not have permisson to edit"}, 403
     data = request.json
     task.update(**data)
-    return task.to_dict
+    return task.to_dict()
 
 @app.route('/tasks/<task_id>', methods=['DELETE'])
 @token_auth.login_required()
